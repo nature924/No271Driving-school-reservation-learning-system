@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ExamquestionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.examquestion_name as examquestionName
+        ,a.kemu_types as kemuTypes
+        ,a.examquestion_options as examquestionOptions
+        ,a.examquestion_answer as examquestionAnswer
+        ,a.examquestion_analysis as examquestionAnalysis
+        ,a.examquestion_types as examquestionTypes
+        ,a.examquestion_sequence as examquestionSequence
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ExamquestionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM examquestion  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.examquestionName != '' and params.examquestionName != null and params.examquestionName != 'null' ">
+                and a.examquestion_name like CONCAT('%',#{params.examquestionName},'%')
+            </if>
+            <if test="params.kemuTypes != null and params.kemuTypes != ''">
+                and a.kemu_types = #{params.kemuTypes}
+            </if>
+            <if test=" params.examquestionOptions != '' and params.examquestionOptions != null and params.examquestionOptions != 'null' ">
+                and a.examquestion_options like CONCAT('%',#{params.examquestionOptions},'%')
+            </if>
+            <if test=" params.examquestionAnswer != '' and params.examquestionAnswer != null and params.examquestionAnswer != 'null' ">
+                and a.examquestion_answer like CONCAT('%',#{params.examquestionAnswer},'%')
+            </if>
+            <if test=" params.examquestionAnalysis != '' and params.examquestionAnalysis != null and params.examquestionAnalysis != 'null' ">
+                and a.examquestion_analysis like CONCAT('%',#{params.examquestionAnalysis},'%')
+            </if>
+            <if test="params.examquestionTypes != null and params.examquestionTypes != ''">
+                and a.examquestion_types = #{params.examquestionTypes}
+            </if>
+            <if test="params.examquestionSequenceStart != null and params.examquestionSequenceStart != ''">
+                <![CDATA[  and a.examquestion_sequence >= #{params.examquestionSequenceStart}   ]]>
+            </if>
+            <if test="params.examquestionSequenceEnd != null and params.examquestionSequenceEnd != ''">
+                <![CDATA[  and a.examquestion_sequence <= #{params.examquestionSequenceEnd}   ]]>
+            </if>
+             <if test="params.examquestionSequence != null and params.examquestionSequence != ''">
+                and a.examquestion_sequence = #{params.examquestionSequence}
+             </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

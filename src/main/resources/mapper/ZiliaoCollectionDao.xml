@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZiliaoCollectionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.ziliao_id as ziliaoId
+        ,a.yonghu_id as yonghuId
+        ,a.ziliao_collection_types as ziliaoCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZiliaoCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,ziliao.ziliao_name as ziliaoName
+        ,ziliao.ziliao_uuid_number as ziliaoUuidNumber
+        ,ziliao.ziliao_photo as ziliaoPhoto
+        ,ziliao.zan_number as zanNumber
+        ,ziliao.cai_number as caiNumber
+        ,ziliao.ziliao_types as ziliaoTypes
+        ,ziliao.ziliao_video as ziliaoVideo
+        ,ziliao.ziliao_file as ziliaoFile
+        ,ziliao.ziliao_content as ziliaoContent
+        ,ziliao.ziliao_delete as ziliaoDelete
+
+        FROM ziliao_collection  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+        left JOIN ziliao ziliao ON a.ziliao_id = ziliao.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.ziliaoId != null and params.ziliaoId != ''">
+                and (
+                    a.ziliao_id = #{params.ziliaoId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.ziliaoCollectionTypes != null and params.ziliaoCollectionTypes != ''">
+                and a.ziliao_collection_types = #{params.ziliaoCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+                <!-- 判断学习资料的id不为空 -->
+            <if test=" params.ziliaoIdNotNull != '' and params.ziliaoIdNotNull != null and params.ziliaoIdNotNull != 'null' ">
+                and a.ziliao_id IS NOT NULL
+            </if>
+            <if test=" params.ziliaoName != '' and params.ziliaoName != null and params.ziliaoName != 'null' ">
+                and ziliao.ziliao_name like CONCAT('%',#{params.ziliaoName},'%')
+            </if>
+            <if test=" params.ziliaoUuidNumber != '' and params.ziliaoUuidNumber != null and params.ziliaoUuidNumber != 'null' ">
+                and ziliao.ziliao_uuid_number like CONCAT('%',#{params.ziliaoUuidNumber},'%')
+            </if>
+            <if test="params.zanNumberStart != null  and params.zanNumberStart != '' ">
+                <![CDATA[  and ziliao.zan_number >= #{params.zanNumberStart}   ]]>
+            </if>
+            <if test="params.zanNumberEnd != null  and params.zanNumberEnd != '' ">
+                <![CDATA[  and ziliao.zan_number <= #{params.zanNumberEnd}   ]]>
+            </if>
+            <if test="params.zanNumber != null  and params.zanNumber != '' ">
+                and ziliao.zan_number = #{params.zanNumber}
+            </if>
+            <if test="params.caiNumberStart != null  and params.caiNumberStart != '' ">
+                <![CDATA[  and ziliao.cai_number >= #{params.caiNumberStart}   ]]>
+            </if>
+            <if test="params.caiNumberEnd != null  and params.caiNumberEnd != '' ">
+                <![CDATA[  and ziliao.cai_number <= #{params.caiNumberEnd}   ]]>
+            </if>
+            <if test="params.caiNumber != null  and params.caiNumber != '' ">
+                and ziliao.cai_number = #{params.caiNumber}
+            </if>
+            <if test="params.ziliaoTypes != null  and params.ziliaoTypes != ''">
+                and ziliao.ziliao_types = #{params.ziliaoTypes}
+            </if>
+
+            <if test=" params.ziliaoVideo != '' and params.ziliaoVideo != null and params.ziliaoVideo != 'null' ">
+                and ziliao.ziliao_video like CONCAT('%',#{params.ziliaoVideo},'%')
+            </if>
+            <if test=" params.ziliaoContent != '' and params.ziliaoContent != null and params.ziliaoContent != 'null' ">
+                and ziliao.ziliao_content like CONCAT('%',#{params.ziliaoContent},'%')
+            </if>
+            <if test="params.ziliaoDeleteStart != null  and params.ziliaoDeleteStart != '' ">
+                <![CDATA[  and ziliao.ziliao_delete >= #{params.ziliaoDeleteStart}   ]]>
+            </if>
+            <if test="params.ziliaoDeleteEnd != null  and params.ziliaoDeleteEnd != '' ">
+                <![CDATA[  and ziliao.ziliao_delete <= #{params.ziliaoDeleteEnd}   ]]>
+            </if>
+            <if test="params.ziliaoDelete != null  and params.ziliaoDelete != '' ">
+                and ziliao.ziliao_delete = #{params.ziliaoDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(ziliao.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(ziliao.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

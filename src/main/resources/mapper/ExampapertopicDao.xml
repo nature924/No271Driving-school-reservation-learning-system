@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ExampapertopicDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.exampaper_id as exampaperId
+        ,a.examquestion_id as examquestionId
+        ,a.exampapertopic_number as exampapertopicNumber
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ExampapertopicView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,exampaper.exampaper_name as exampaperName
+        ,exampaper.exampaper_date as exampaperDate
+        ,exampaper.exampaper_myscore as exampaperMyscore
+        ,exampaper.kemu_types as kemuTypes
+        ,exampaper.exampaper_types as exampaperTypes
+        ,exampaper.zujuan_types as zujuanTypes
+        ,exampaper.exampaper_delete as exampaperDelete
+        ,examquestion.examquestion_name as examquestionName
+        ,examquestion.kemu_types as kemuTypes
+        ,examquestion.examquestion_options as examquestionOptions
+        ,examquestion.examquestion_answer as examquestionAnswer
+        ,examquestion.examquestion_analysis as examquestionAnalysis
+        ,examquestion.examquestion_types as examquestionTypes
+        ,examquestion.examquestion_sequence as examquestionSequence
+
+        FROM exampapertopic  a
+        left JOIN exampaper exampaper ON a.exampaper_id = exampaper.id
+        left JOIN examquestion examquestion ON a.examquestion_id = examquestion.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.exampaperId != null and params.exampaperId != ''">
+                and (
+                    a.exampaper_id = #{params.exampaperId}
+                )
+            </if>
+            <if test="params.examquestionId != null and params.examquestionId != ''">
+                and (
+                    a.examquestion_id = #{params.examquestionId}
+                )
+            </if>
+            <if test="params.exampapertopicNumberStart != null and params.exampapertopicNumberStart != ''">
+                <![CDATA[  and a.exampapertopic_number >= #{params.exampapertopicNumberStart}   ]]>
+            </if>
+            <if test="params.exampapertopicNumberEnd != null and params.exampapertopicNumberEnd != ''">
+                <![CDATA[  and a.exampapertopic_number <= #{params.exampapertopicNumberEnd}   ]]>
+            </if>
+             <if test="params.exampapertopicNumber != null and params.exampapertopicNumber != ''">
+                and a.exampapertopic_number = #{params.exampapertopicNumber}
+             </if>
+
+                <!-- 判断试卷的id不为空 -->
+            <if test=" params.exampaperIdNotNull != '' and params.exampaperIdNotNull != null and params.exampaperIdNotNull != 'null' ">
+                and a.exampaper_id IS NOT NULL
+            </if>
+            <if test=" params.exampaperName != '' and params.exampaperName != null and params.exampaperName != 'null' ">
+                and exampaper.exampaper_name like CONCAT('%',#{params.exampaperName},'%')
+            </if>
+            <if test="params.exampaperDateStart != null  and params.exampaperDateStart != '' ">
+                <![CDATA[  and exampaper.exampaper_date >= #{params.exampaperDateStart}   ]]>
+            </if>
+            <if test="params.exampaperDateEnd != null  and params.exampaperDateEnd != '' ">
+                <![CDATA[  and exampaper.exampaper_date <= #{params.exampaperDateEnd}   ]]>
+            </if>
+            <if test="params.exampaperDate != null  and params.exampaperDate != '' ">
+                and exampaper.exampaper_date = #{params.exampaperDate}
+            </if>
+            <if test="params.exampaperMyscoreStart != null  and params.exampaperMyscoreStart != '' ">
+                <![CDATA[  and exampaper.exampaper_myscore >= #{params.exampaperMyscoreStart}   ]]>
+            </if>
+            <if test="params.exampaperMyscoreEnd != null  and params.exampaperMyscoreEnd != '' ">
+                <![CDATA[  and exampaper.exampaper_myscore <= #{params.exampaperMyscoreEnd}   ]]>
+            </if>
+            <if test="params.exampaperMyscore != null  and params.exampaperMyscore != '' ">
+                and exampaper.exampaper_myscore = #{params.exampaperMyscore}
+            </if>
+            <if test="params.kemuTypes != null  and params.kemuTypes != ''">
+                and exampaper.kemu_types = #{params.kemuTypes}
+            </if>
+
+            <if test="params.exampaperTypes != null  and params.exampaperTypes != ''">
+                and exampaper.exampaper_types = #{params.exampaperTypes}
+            </if>
+
+            <if test="params.zujuanTypes != null  and params.zujuanTypes != ''">
+                and exampaper.zujuan_types = #{params.zujuanTypes}
+            </if>
+
+            <if test="params.exampaperDeleteStart != null  and params.exampaperDeleteStart != '' ">
+                <![CDATA[  and exampaper.exampaper_delete >= #{params.exampaperDeleteStart}   ]]>
+            </if>
+            <if test="params.exampaperDeleteEnd != null  and params.exampaperDeleteEnd != '' ">
+                <![CDATA[  and exampaper.exampaper_delete <= #{params.exampaperDeleteEnd}   ]]>
+            </if>
+            <if test="params.exampaperDelete != null  and params.exampaperDelete != '' ">
+                and exampaper.exampaper_delete = #{params.exampaperDelete}
+            </if>
+                <!-- 判断试题表的id不为空 -->
+            <if test=" params.examquestionIdNotNull != '' and params.examquestionIdNotNull != null and params.examquestionIdNotNull != 'null' ">
+                and a.examquestion_id IS NOT NULL
+            </if>
+            <if test=" params.examquestionName != '' and params.examquestionName != null and params.examquestionName != 'null' ">
+                and examquestion.examquestion_name like CONCAT('%',#{params.examquestionName},'%')
+            </if>
+            <if test="params.kemuTypes != null  and params.kemuTypes != ''">
+                and examquestion.kemu_types = #{params.kemuTypes}
+            </if>
+
+            <if test=" params.examquestionOptions != '' and params.examquestionOptions != null and params.examquestionOptions != 'null' ">
+                and examquestion.examquestion_options like CONCAT('%',#{params.examquestionOptions},'%')
+            </if>
+            <if test=" params.examquestionAnswer != '' and params.examquestionAnswer != null and params.examquestionAnswer != 'null' ">
+                and examquestion.examquestion_answer like CONCAT('%',#{params.examquestionAnswer},'%')
+            </if>
+            <if test=" params.examquestionAnalysis != '' and params.examquestionAnalysis != null and params.examquestionAnalysis != 'null' ">
+                and examquestion.examquestion_analysis like CONCAT('%',#{params.examquestionAnalysis},'%')
+            </if>
+            <if test="params.examquestionTypes != null  and params.examquestionTypes != ''">
+                and examquestion.examquestion_types = #{params.examquestionTypes}
+            </if>
+
+            <if test="params.examquestionSequenceStart != null  and params.examquestionSequenceStart != '' ">
+                <![CDATA[  and examquestion.examquestion_sequence >= #{params.examquestionSequenceStart}   ]]>
+            </if>
+            <if test="params.examquestionSequenceEnd != null  and params.examquestionSequenceEnd != '' ">
+                <![CDATA[  and examquestion.examquestion_sequence <= #{params.examquestionSequenceEnd}   ]]>
+            </if>
+            <if test="params.examquestionSequence != null  and params.examquestionSequence != '' ">
+                and examquestion.examquestion_sequence = #{params.examquestionSequence}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
